@@ -10,7 +10,8 @@ import {
     Clock,
     Scale,
     Zap,
-    AlertTriangle
+    AlertTriangle,
+    Download
 } from 'lucide-react';
 
 export const Icons = {
@@ -32,5 +33,6 @@ export const Icons = {
     Power: Zap,
     Zap: Zap,
     Alert: AlertTriangle,
-    AlertTriangle: AlertTriangle
+    AlertTriangle: AlertTriangle,
+    Download: Download
 };

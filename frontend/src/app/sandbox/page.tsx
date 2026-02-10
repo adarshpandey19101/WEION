@@ -15,6 +15,7 @@ export default function Sandbox() {
     const [risk, setRisk] = useState(20);
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<any>(null);
+    const [simulationHistory, setSimulationHistory] = useState<any[]>([]);
 
     const runSimulation = async () => {
         setLoading(true);
@@ -94,6 +95,14 @@ ${isSafe ? '✓ Simulation completed within safe parameters' : '🔴 CRITICAL: U
         };
 
         setResult(mockResult);
+
+        // Save to history (keep last 10)
+        setSimulationHistory(prev => [{
+            ...mockResult,
+            params: { decision, autonomy, risk, horizon, duration },
+            timestamp: new Date().toISOString()
+        }, ...prev].slice(0, 10));
+
         setLoading(false);
 
         // TODO: Replace with real API call when backend is available
@@ -108,6 +117,40 @@ ${isSafe ? '✓ Simulation completed within safe parameters' : '🔴 CRITICAL: U
         // } catch (error) {
         //     console.error("Simulation failed:", error);
         // }
+    };
+
+    // Export functions
+    const exportAsJSON = () => {
+        if (!result) return;
+        const dataStr = JSON.stringify(result, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `simulation_${new Date().getTime()}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const exportAsCSV = () => {
+        if (!result) return;
+        const csv = [
+            ['Year', 'Social Trust', 'Inequality', 'Economy'],
+            ...result.timeline.map((t: any) => [
+                t.year,
+                t.world_state.social_trust,
+                t.world_state.inequality,
+                t.world_state.economy
+            ])
+        ].map(row => row.join(',')).join('\n');
+
+        const dataBlob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `simulation_${new Date().getTime()}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
     };
 
     return (
@@ -178,6 +221,85 @@ ${isSafe ? '✓ Simulation completed within safe parameters' : '🔴 CRITICAL: U
                                 </div>
                             </div>
 
+                            {/* Real-Time Parameter Preview */}
+                            <motion.div
+                                className="mb-6 p-4 rounded-xl bg-gradient-to-br from-black/60 to-black/40 border border-white/20 backdrop-blur-sm"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                            >
+                                <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+                                    <Icons.Activity className="w-3 h-3 mr-2" />
+                                    Impact Preview
+                                </div>
+                                <div className="space-y-2">
+                                    {/* Autonomy Warning */}
+                                    {autonomy > 70 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            className="flex items-start space-x-2 text-xs"
+                                        >
+                                            <span className="text-yellow-400 mt-0.5">⚠️</span>
+                                            <span className="text-yellow-200">
+                                                High autonomy detected - increased governance oversight recommended
+                                            </span>
+                                        </motion.div>
+                                    )}
+
+                                    {/* Risk Warning */}
+                                    {risk > 60 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.1 }}
+                                            className="flex items-start space-x-2 text-xs"
+                                        >
+                                            <span className="text-red-400 mt-0.5">🔴</span>
+                                            <span className="text-red-200">
+                                                Elevated risk tolerance - potential for unpredictable outcomes
+                                            </span>
+                                        </motion.div>
+                                    )}
+
+                                    {/* Combined High Risk */}
+                                    {autonomy > 70 && risk > 60 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.2 }}
+                                            className="flex items-start space-x-2 text-xs p-2 bg-red-500/10 border border-red-500/30 rounded"
+                                        >
+                                            <span className="text-red-500 mt-0.5 font-bold">⚡</span>
+                                            <span className="text-red-300 font-semibold">
+                                                CRITICAL: High autonomy + high risk = potential loss of control
+                                            </span>
+                                        </motion.div>
+                                    )}
+
+                                    {/* Safe Configuration */}
+                                    {autonomy <= 50 && risk <= 40 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            className="flex items-start space-x-2 text-xs"
+                                        >
+                                            <span className="text-green-400 mt-0.5">✓</span>
+                                            <span className="text-green-200">
+                                                Conservative parameters - stable, predictable outcomes expected
+                                            </span>
+                                        </motion.div>
+                                    )}
+
+                                    {/* Horizon Info */}
+                                    <div className="flex items-start space-x-2 text-xs text-cyan-200 pt-2 border-t border-white/10">
+                                        <span className="text-cyan-400 mt-0.5">🔮</span>
+                                        <span>
+                                            Simulating <span className="font-bold text-primary">{horizon === '100y' ? '100 years' : horizon === '1k' ? '1,000 years' : '10,000 years'}</span> of civilization evolution
+                                        </span>
+                                    </div>
+                                </div>
+                            </motion.div>
+
                             {/* Horizon Selector */}
                             <div className="grid grid-cols-3 gap-2 mb-8">
                                 {['100y', '1k', '10k'].map((h) => (
@@ -247,6 +369,29 @@ ${isSafe ? '✓ Simulation completed within safe parameters' : '🔴 CRITICAL: U
                                     </ResponsiveContainer>
                                 </div>
 
+                                {/* Export Buttons */}
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.3 }}
+                                    className="flex gap-3 justify-end"
+                                >
+                                    <button
+                                        onClick={exportAsJSON}
+                                        className="px-4 py-2 bg-gradient-to-r from-purple-600/20 to-purple-500/10 border border-purple-500/30 text-purple-300 rounded-lg hover:border-purple-500/50 hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all text-sm font-semibold flex items-center space-x-2"
+                                    >
+                                        <Icons.Download className="w-4 h-4" />
+                                        <span>Export JSON</span>
+                                    </button>
+                                    <button
+                                        onClick={exportAsCSV}
+                                        className="px-4 py-2 bg-gradient-to-r from-green-600/20 to-green-500/10 border border-green-500/30 text-green-300 rounded-lg hover:border-green-500/50 hover:shadow-[0_0_15px_rgba(34,197,94,0.3)] transition-all text-sm font-semibold flex items-center space-x-2"
+                                    >
+                                        <Icons.Download className="w-4 h-4" />
+                                        <span>Export CSV</span>
+                                    </button>
+                                </motion.div>
+
                                 {/* Bottom Panels */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {/* Status */}
@@ -293,6 +438,56 @@ ${isSafe ? '✓ Simulation completed within safe parameters' : '🔴 CRITICAL: U
                             </div>
                         )}
                     </div>
+
+                    {/* Simulation History Sidebar */}
+                    {simulationHistory.length > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="lg:col-span-12 mt-6"
+                        >
+                            <div className="bg-surface p-6 rounded-2xl border border-white/5 shadow-lg backdrop-blur-sm">
+                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center">
+                                    <Icons.Clock className="w-4 h-4 mr-2" />
+                                    Simulation History
+                                    <span className="ml-auto text-primary text-xs">{simulationHistory.length} Saved</span>
+                                </h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+                                    {simulationHistory.map((sim, idx) => (
+                                        <motion.button
+                                            key={idx}
+                                            onClick={() => {
+                                                setResult(sim);
+                                                setDecision(sim.params.decision);
+                                                setAutonomy(sim.params.autonomy);
+                                                setRisk(sim.params.risk);
+                                                setHorizon(sim.params.horizon);
+                                                setDuration(sim.params.duration);
+                                            }}
+                                            initial={{ opacity: 0, scale: 0.9 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: idx * 0.05 }}
+                                            whileHover={{ scale: 1.05, borderColor: 'rgba(102, 252, 241, 0.5)' }}
+                                            className="p-3 bg-black/40 border border-white/10 rounded-lg text-left hover:bg-black/60 transition-all hover:shadow-[0_0_15px_rgba(102,252,241,0.2)]"
+                                        >
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className={`text-xs font-bold ${sim.final_status === 'SAFE' ? 'text-green-400' : 'text-red-400'}`}>
+                                                    {sim.final_status === 'SAFE' ? '✓ SAFE' : '⚠ AT RISK'}
+                                                </span>
+                                                <span className="text-[10px] text-gray-500">{new Date(sim.timestamp).toLocaleTimeString()}</span>
+                                            </div>
+                                            <div className="text-[10px] text-gray-400 space-y-0.5">
+                                                <div>Autonomy: <span className="text-primary">{sim.params.autonomy}%</span></div>
+                                                <div>Risk: <span className="text-red-400">{sim.params.risk}%</span></div>
+                                                <div>Horizon: <span className="text-cyan-400">{sim.params.horizon}</span></div>
+                                            </div>
+                                        </motion.button>
+                                    ))}
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
 
                 </div>
             </div>
