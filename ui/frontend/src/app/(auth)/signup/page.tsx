@@ -44,7 +44,15 @@ export default function SignupPage() {
                 return;
             }
 
-            // Ideally, show a "Check your email" message here
+            // If email confirmation is disabled, we get a session immediately.
+            // In that case, redirect to dashboard.
+            if (data.session) {
+                router.push("/dashboard");
+                router.refresh();
+                return;
+            }
+
+            // Otherwise, show the email confirmation message
             setError(null);
             alert("Check your email for the confirmation link!");
             router.push("/login");
