@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.env
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+
+# OS
+.DS_Store
+
+# Database
+*.db
+logs/
+uploads/
+
+# Cache
+logs/llm_cache/
+logs/vector_memory/
