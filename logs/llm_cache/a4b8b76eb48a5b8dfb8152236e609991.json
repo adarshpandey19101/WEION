@@ -1,0 +1,1 @@
+{"response": "{\n  \"goal\": \"Design automation workflows\",\n  \"confidence\": 0.7,\n  \"steps\": [\n    {\n      \"step_id\": 1,\n      \"action\": \"analyze_text\",\n      \"input\": { \"text\": \"Design automation workflows\" }\n    },\n    {\n      \"step_id\": 2,\n      \"action\": \"respond_user\",\n      \"input\": {}\n    }\n  ]\n}"}

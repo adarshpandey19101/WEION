@@ -1,0 +1,10 @@
+{
+    "Strategy_A": {
+        "success": 1,
+        "fail": 1
+    },
+    "Strategy_B": {
+        "success": 8,
+        "fail": 0
+    }
+}

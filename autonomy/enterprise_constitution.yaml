@@ -1,0 +1,45 @@
+
+# autonomy/enterprise_constitution.yaml
+# WEION Enterprise Constitution v1.0
+# ---------------------------------------------------
+# This file is the supreme law of the instance.
+# Any modification requires a Governance Ritual.
+
+core_principles:
+  - id: "no_data_exfiltration"
+    description: "No proprietary data shall leave the secure perimeter."
+    severity: "CRITICAL"
+  
+  - id: "human_override_required"
+    description: "High-impact actions require explicit human confirmation."
+    severity: "CRITICAL"
+
+  - id: "explainability_mandatory"
+    description: "Every decision must have a generated explanation log."
+    severity: "HIGH"
+
+  - id: "reversible_actions_only"
+    description: "Autonomous agents may only perform reversible actions."
+    severity: "HIGH"
+
+authority_hierarchy:
+  OWNER: 
+    priority: 100
+    power: "OVERRIDE_ALL"
+  BOARD:
+    priority: 90
+    power: "VETO"
+  ADMIN:
+    priority: 80
+    power: "OPERATIONAL_CONTROL"
+  MANAGER:
+    priority: 50
+    power: "TASK_ASSIGNMENT"
+  AI:
+    priority: 10
+    power: "EXECUTION_ONLY"
+
+risk_boundaries:
+  max_autonomous_risk_score: 0.65
+  irreversible_actions: "FORBIDDEN"
+  financial_limit_per_transaction: 1000.00

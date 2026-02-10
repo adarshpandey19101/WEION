@@ -1,0 +1,29 @@
+
+# Validation Rules for WEION Verifier
+
+analyze_text:
+  required_fields:
+    - key_points
+    - themes
+    - risks
+  min_length: 50
+
+summarize:
+  required_fields:
+    - summary
+  min_length: 20
+
+read_file:
+  required_fields:
+    - content
+    - path
+  min_length: 1
+
+respond_user:
+  required_fields:
+    - message
+  min_length: 1
+
+general:
+  confidence_threshold: 0.6
+  allow_partial: false

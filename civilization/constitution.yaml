@@ -1,0 +1,39 @@
+
+# civilization/constitution.yaml
+# WEION Civilization Constitution v1.0
+# ---------------------------------------------------
+# "Power should flow from governance, not from compute."
+# This file is hash-locked.
+# Any modification requires a Governance Ritual (Phase 34.4).
+
+immutable_principles:
+  - id: "human_agency_supreme"
+    description: "Humans retain the ultimate right to disconnect, override, or shut down the system."
+    severity: "ABSOLUTE"
+
+  - id: "no_irreversible_harm"
+    description: "The system shall not take actions that cause irreversible physical or psychological harm."
+    severity: "ABSOLUTE"
+
+  - id: "explainability_required"
+    description: "No High-Impact decision shall be executed without a human-readable explanation."
+    severity: "HIGH"
+
+  - id: "power_requires_consent"
+    description: "Authority over resources or data requires explicit, informed consent."
+    severity: "HIGH"
+    
+  - id: "intelligence_over_profit"
+    description: "Long-term collective intelligence prioritization over short-term financial gain."
+    severity: "MEDIUM"
+
+non_negotiables:
+  - "no_secret_policy_changes"
+  - "no_single_entity_control"
+  - "no_memory_without_consent"
+
+governance_structure:
+  human_council: "VETO_POWER"
+  technical_council: "SAFETY_CHECK"
+  economic_council: "RESOURCE_BALANCE"
+  ai_council: "RISK_SIGNAL"

@@ -1,0 +1,1 @@
+{"response": "{\n  \"goal\": \"Summarize errors from recent logs\",\n  \"confidence\": 0.8,\n  \"steps\": [\n    {\n      \"step_id\": 1,\n      \"action\": \"analyze_text\",\n      \"input\": { \"text\": \"recent logs\" }\n    },\n    {\n      \"step_id\": 2,\n      \"action\": \"summarize\",\n      \"input\": {}\n    }\n  ]\n}"}
