@@ -1,8 +1,13 @@
 "use client";
 
-import { Bell, Search, User } from "lucide-react";
+import { Bell, Search, User as UserIcon } from "lucide-react";
+import { User } from "@supabase/supabase-js";
 
-export function Topbar() {
+interface TopbarProps {
+    user?: User;
+}
+
+export function Topbar({ user }: TopbarProps) {
     return (
         <header className="h-14 border-b bg-background px-6 flex items-center justify-between shrink-0">
             {/* Search */}
@@ -26,9 +31,11 @@ export function Topbar() {
 
                 <button className="flex items-center gap-2 pl-2 hover:bg-muted/50 p-1.5 rounded-md transition-colors">
                     <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center border">
-                        <User className="w-3.5 h-3.5 text-muted-foreground" />
+                        <UserIcon className="w-3.5 h-3.5 text-muted-foreground" />
                     </div>
-                    <span className="text-xs font-medium hidden md:block">Adarsh Pandey</span>
+                    <span className="text-xs font-medium hidden md:block">
+                        {user?.email || "Adarsh Pandey"}
+                    </span>
                 </button>
             </div>
         </header>

@@ -1,12 +1,34 @@
-"use client";
 
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { DashboardShell } from "@/components/layout/DashboardShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Brain, Target, Zap } from "lucide-react";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+    const supabase = await createClient();
+
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        redirect("/login");
+    }
+
+    // Fetch Active Missions Count
+    const { count: activeMissionsCount } = await supabase
+        .from('missions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'active');
+
+    // Fetch Recent Missions
+    const { data: recentMissions } = await supabase
+        .from('missions')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
     return (
-        <DashboardShell>
+        <DashboardShell user={user}>
             <div className="space-y-6">
                 <h1 className="text-3xl font-bold text-white">Console Overview</h1>
 
@@ -20,8 +42,8 @@ export default function DashboardPage() {
                             <Target className="h-4 w-4 text-cyan-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-white">12</div>
-                            <p className="text-xs text-slate-500">+2 from last week</p>
+                            <div className="text-2xl font-bold text-white">{activeMissionsCount || 0}</div>
+                            <p className="text-xs text-slate-500">Live Goals</p>
                         </CardContent>
                     </Card>
                     <Card className="border-slate-800 bg-slate-900/50">
@@ -71,17 +93,23 @@ export default function DashboardPage() {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                {[1, 2, 3, 4, 5].map((i) => (
-                                    <div key={i} className="flex items-start gap-4 p-3 rounded-lg hover:bg-slate-800/50 transition-colors">
-                                        <div className="w-2 h-2 mt-2 rounded-full bg-cyan-500 animate-pulse" />
-                                        <div>
-                                            <p className="text-sm text-slate-300">
-                                                Analyzing optimization strategy for Q3 supply chain logistics...
-                                            </p>
-                                            <p className="text-xs text-slate-500 mt-1">2m ago • Agent-007</p>
+                                {recentMissions && recentMissions.length > 0 ? (
+                                    recentMissions.map((mission: any) => (
+                                        <div key={mission.id} className="flex items-start gap-4 p-3 rounded-lg hover:bg-slate-800/50 transition-colors">
+                                            <div className="w-2 h-2 mt-2 rounded-full bg-cyan-500 animate-pulse" />
+                                            <div>
+                                                <p className="text-sm text-slate-300">
+                                                    {mission.title}
+                                                </p>
+                                                <p className="text-xs text-slate-500 mt-1">Status: {mission.status}</p>
+                                            </div>
                                         </div>
+                                    ))
+                                ) : (
+                                    <div className="text-sm text-slate-500 p-4 text-center">
+                                        No active missions found. Start a new mission in the AI Console.
                                     </div>
-                                ))}
+                                )}
                             </div>
                         </CardContent>
                     </Card>
@@ -94,10 +122,10 @@ export default function DashboardPage() {
                         <CardContent>
                             <div className="space-y-4">
                                 <div className="p-3 rounded-lg border border-yellow-500/20 bg-yellow-500/10">
-                                    <p className="text-sm text-yellow-200">Approval Required: Budget allocation exceeded threshold for Project X.</p>
+                                    <p className="text-sm text-yellow-200">System initialized.</p>
                                 </div>
                                 <div className="p-3 rounded-lg border border-blue-500/20 bg-blue-500/10">
-                                    <p className="text-sm text-blue-200">New knowledge graph nodes ingested from Q1 Report.</p>
+                                    <p className="text-sm text-blue-200">Database connection established.</p>
                                 </div>
                             </div>
                         </CardContent>

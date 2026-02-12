@@ -3,12 +3,14 @@
 import { ReactNode } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
+import { User } from "@supabase/supabase-js";
 
 interface DashboardShellProps {
     children: ReactNode;
+    user?: User;
 }
 
-export function DashboardShell({ children }: DashboardShellProps) {
+export function DashboardShell({ children, user }: DashboardShellProps) {
     return (
         <div className="flex h-screen bg-background font-sans text-foreground">
             {/* Sidebar - Fixed width */}
@@ -17,7 +19,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
             {/* Main Content Area */}
             <div className="flex flex-1 flex-col overflow-hidden bg-background">
                 {/* Topbar */}
-                <Topbar />
+                <Topbar user={user} />
 
                 {/* Page Content */}
                 <main className="flex-1 overflow-y-auto p-8">
